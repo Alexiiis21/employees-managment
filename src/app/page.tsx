@@ -10,10 +10,8 @@ import { DeleteConfirmation } from '@/components/employees/DeleteConfirmation';
 import { Employee } from '@/types/employee';
 import { EmployeeMobileList } from '@/components/employees/EmployeeMobile';
 
-// API configuration
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Status mapping helpers
 const mapStatusToApi = (status: string): string => {
   switch (status) {
     case 'Active': return 'ACTIVE';
@@ -42,7 +40,6 @@ export default function EmployeeDashboard() {
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if we're on mobile
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -56,14 +53,12 @@ export default function EmployeeDashboard() {
     };
   }, []);
 
-  // Fetch employees on component mount
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(`${API_URL}/api/employees`);
         
-        // Transform API response to match frontend format
         const transformedEmployees = response.data.data.map((emp: Employee) => ({
           id: emp.id,
           name: emp.name,
@@ -105,7 +100,6 @@ export default function EmployeeDashboard() {
     fetchEmployees();
   }, []);
 
-  // Filter employees based on search term
   const filteredEmployees = employees.filter(
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,10 +110,8 @@ export default function EmployeeDashboard() {
       (employee.address && employee.address.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Handle employee creation
   const handleAddEmployee = async (newEmployee: Omit<Employee, 'id'>) => {
     try {
-      // Transform data for API
       const apiData = {
         name: newEmployee.name,
         email: newEmployee.email,
@@ -131,10 +123,8 @@ export default function EmployeeDashboard() {
         dateOfJoining: newEmployee.hireDate || newEmployee.dateOfJoining,
       };
 
-      // Call API to create employee
-      const response = await axios.post(`${API_URL}/employees`, apiData);
+      const response = await axios.post(`${API_URL}/api/employees`, apiData);
       
-      // Add the newly created employee to the state
       const createdEmployee = response.data.data;
       const newEmployeeForState: Employee = {
         id: createdEmployee.id,
@@ -161,10 +151,8 @@ export default function EmployeeDashboard() {
     }
   };
 
-  // Handle employee update
   const handleUpdateEmployee = async (employee: Employee) => {
     try {
-      // Transform data for API
       const apiData = {
         name: employee.name,
         email: employee.email,
@@ -176,10 +164,8 @@ export default function EmployeeDashboard() {
         dateOfJoining: employee.hireDate || employee.dateOfJoining,
       };
 
-      // Call API to update employee
-      await axios.put(`${API_URL}/employees/${employee.id}`, apiData);
+      await axios.put(`${API_URL}/api/employees/${employee.id}`, apiData);
       
-      // Update local state
       setEmployees(
         employees.map((emp) => emp.id === employee.id ? employee : emp)
       );
@@ -196,15 +182,12 @@ export default function EmployeeDashboard() {
     }
   };
 
-  // Handle employee deletion
   const handleDeleteEmployee = async () => {
     if (!currentEmployee) return false;
     
     try {
-      // Call API to delete employee
-      await axios.delete(`${API_URL}/employees/${currentEmployee.id}`);
+      await axios.delete(`${API_URL}/api/employees/${currentEmployee.id}`);
       
-      // Update local state
       setEmployees(employees.filter((emp) => emp.id !== currentEmployee.id));
       
       setShowDeleteModal(false);
