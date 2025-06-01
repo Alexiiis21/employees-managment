@@ -20,7 +20,7 @@ export default function SignIn() {
     
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL;
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
