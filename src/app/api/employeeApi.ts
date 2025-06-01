@@ -1,10 +1,8 @@
 import { Employee } from '@/types/employee';
 import axios from 'axios';
 
-// Define the API base URL - adjust if your Express API runs on a different port
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Status mapping between frontend and backend
 const mapStatusToApi = (status: string): string => {
   switch (status) {
     case 'Active': return 'ACTIVE';
@@ -23,7 +21,6 @@ const mapStatusFromApi = (status: string): 'Active' | 'Inactive' | 'On Leave' =>
   }
 };
 
-// Create a new employee
 export const createEmployee = async (employeeData: Employee) => {
   try {
     const apiData = {
@@ -32,7 +29,7 @@ export const createEmployee = async (employeeData: Employee) => {
       position: employeeData.position,
       department: employeeData.department,
       status: mapStatusToApi(employeeData.status),
-      dateOfJoining: employeeData.hireDate, // API uses dateOfJoining, frontend uses hireDate
+      dateOfJoining: employeeData.hireDate,
       phone: employeeData.phone,
       address: employeeData.address,
     };
@@ -45,12 +42,10 @@ export const createEmployee = async (employeeData: Employee) => {
   }
 };
 
-// Fetch all employees
 export const fetchEmployees = async () => {
   try {
     const response = await axios.get(`${API_URL}/employees`);
     
-    // Transform API response to match frontend format
     const transformedEmployees = response.data.data.map((emp: Employee) => ({
       id: emp.id,
       name: emp.name,
