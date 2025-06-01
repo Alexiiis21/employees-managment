@@ -61,7 +61,7 @@ export default function EmployeeDashboard() {
     const fetchEmployees = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${API_URL}/employees`);
+        const response = await axios.get(`${API_URL}/api/employees`);
         
         // Transform API response to match frontend format
         const transformedEmployees = response.data.data.map((emp: Employee) => ({
