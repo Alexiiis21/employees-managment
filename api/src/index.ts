@@ -5,31 +5,50 @@ import dotenv from 'dotenv';
 import employeeRoutes from './routes/employees';
 import authRoutes from './routes/auth';
 
-// Load environment variables
 dotenv.config();
 
-// Create Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true  // Importante para cookies
+  origin: [
+    'http://localhost:3000',
+    ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+    'https://employees-managment-ojeoajbye-alexis-projects-c8977355.vercel.app',
+    'https://employees-managment.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Routes
 app.use('/api/employees', employeeRoutes);
 app.use('/api/auth', authRoutes);
 
-// Root route
-app.get('/', (req, res) => {
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Employee Management API is running');
 });
 
-// Start server
+app.get('/health', (req: express.Request, res: express.Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    error: 'Something went wrong!',
+    message: err.message || 'Internal Server Error'
+  });
+});
+
+app.use((req: express.Request, res: express.Response) => {
+  res.status(404).json({ error: `Route ${req.method} ${req.url} not found` });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`API available at http://localhost:${PORT}/api`);
 });
